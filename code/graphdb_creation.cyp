@@ -19,16 +19,40 @@ CREATE (customer)-[:PERFORMS]->(transaction);
 
 
 
-MATCH (c1:Customer)-[:MAKE]->(t1:Transaction)-[:WITH]->(m1:Merchant)
+MATCH (c1:Customer)-[:PERFORMS]->(t1:Transaction)-[:WITH]->(m1:Merchant)
 WITH c1, m1
 MERGE (p1:Placeholder {id: m1.id})
 
-MATCH (c1:Customer)-[:MAKE]->(t1:Transaction)-[:WITH]->(b1:Merchant)
-WITH c1, b1, count(*) as cnt
-MATCH (p1:Placeholder {id:c1.id})
-WITH c1, b1, p1, cnt
-MATCH (p2:Placeholder {id: b1.id})
-WITH c1, b1, p1, p2, cnt
-CREATE (p1)-[:Payes {cnt: cnt}]->(p2)
+MATCH (c1:Customer)-[:PERFORMS]->(t1:Transaction)-[:WITH]->(m1:Merchant)
+WITH c1, m1, count(*) as cnt
+MERGE (p2:Placeholder {id:c1.id})
 
-CALL algo.pageRank('Placeholder', 'Payes', {writeProperty: 'pagerank'})
+MATCH (c1:Customer)-[:PERFORMS]->(t1:Transaction)-[:WITH]->(m1:Merchant)
+WITH c1, m1, count(*) as cnt
+MATCH (p1:Placeholder {id:m1.id})
+WITH c1, m1, p1, cnt
+MATCH (p2:Placeholder {id: c1.id})
+WITH c1, m1, p1, p2, cnt
+CREATE (p2)-[:PAYS {cnt: cnt}]->(p1)
+
+MATCH (c1:Customer)-[:PERFORMS]->(t1:Transaction)-[:WITH]->(m1:Merchant)
+WITH c1, m1, count(*) as cnt
+MATCH (p1:Placeholder {id:c1.id})
+WITH c1, m1, p1, cnt
+MATCH (p2:Placeholder {id: m1.id})
+WITH c1, m1, p1, p2, cnt
+CREATE (p1)-[:PAYS {cnt: cnt}]->(p2)
+
+
+// Computing PageRank for placeholder nodes
+CALL algo.pageRank('Placeholder', 'PAYS', {writeProperty: 'pagerank'})
+
+// Viewing the PageRank results
+MATCH (p:Placeholder)
+RETURN p.id AS id, p.pagerank as pagerank
+ORDER BY pagerank DESC
+
+CALL algo.pageRank.stream('Placeholder', 'PAYS', {
+  iterations:20, dampingFactor:0.85, writeProperty: 'pagerank'
+})
+YIELD nodeId, score
