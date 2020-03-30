@@ -56,3 +56,14 @@ CALL algo.pageRank.stream('Placeholder', 'PAYS', {
   iterations:20, dampingFactor:0.85, writeProperty: 'pagerank'
 })
 YIELD nodeId, score
+
+// Computing the degree of each node
+MATCH (p:Placeholder)
+SET p.degree = apoc.node.degree(p, 'PAYS')
+
+// Community detection using label propagation
+CALL algo.beta.labelPropagation('Placeholder', 'PAYS', {write:true, writeProperty: "community", weightProperty: "cnt"})
+
+
+MATCH (p:Placeholder)
+RETURN p.id AS id, p.pagerank as pagerank, p.degree as degree, p.community as community
