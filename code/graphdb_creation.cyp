@@ -67,3 +67,6 @@ CALL algo.beta.labelPropagation('Placeholder', 'PAYS', {write:true, writePropert
 
 MATCH (p:Placeholder)
 RETURN p.id AS id, p.pagerank as pagerank, p.degree as degree, p.community as community
+
+// Computing node similarity
+CALL algo.nodeSimilarity('Placeholder', 'PAYS', {writeProperty: 'similarity'})
