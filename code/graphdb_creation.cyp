@@ -70,3 +70,8 @@ RETURN p.id AS id, p.pagerank as pagerank, p.degree as degree, p.community as co
 
 // Computing node similarity
 CALL algo.nodeSimilarity('Placeholder', 'PAYS', {writeProperty: 'similarity'})
+
+// Query to obtain the relationships of a particular customer node
+match (c1:Customer)-[:PERFORMS]->(t1:Transaction)-[:WITH]->(m1:Merchant)
+where c1.id = "C2054744914"
+return c1, t1, m1
