@@ -1,7 +1,4 @@
 # Graph-ML-Fraud-Detection
 
-
-Instructions to run the project:
-
-Before running the code, please create a folder named "data" inside the repository folder and add the files from the BankSim dataset to the same.
-
+In this project, we aim to detect fraudulent behavior in bank transactions using graph databases and machine learning models.
+The dataset used for this project is the BankSim dataset which is a simulated dataset created using a sample of transactional data provided by a bank in Spain (https://www.kaggle.com/ntnu-testimon/banksim1).
