@@ -1,23 +1,31 @@
 var fileName = "sample.csv";
-var nutritionFields = ["es_transportation", "es_food", "es_fashion", "es_leisure", "es_health", "es_home", "legitimate_count", "fraudulent_count"];
+var nutritionFields = ["es_transportation", "es_food", "es_fashion", "es_leisure", "es_health", "es_home"];
+var piechartFields = ["legitimate_count", "fraudulent_count"];
 
 d3.csv(fileName, function(error, data) {
  var cerealMap = {};
- console.log(data)
+ var piechartMap = {};
+ //console.log(data)
  data.forEach(function(d) {
   var cereal = d.customer_id;
   cerealMap[cereal] = [];
+  piechartMap[cereal] = [];
 
   // { cerealName: [ bar1Val, bar2Val, ... ] }
   nutritionFields.forEach(function(field) {
    cerealMap[cereal].push(+d[field]);
   });
+
+  piechartFields.forEach(function(field) {
+   piechartMap[cereal].push(+d[field]);
+  });
+
  });
- makeVis(cerealMap);
+ makeVis(cerealMap, piechartMap);
 
 });
 
-var makeVis = function(cerealMap) {
+var makeVis = function(cerealMap, piechartMap) {
  // Define dimensions of vis
  var margin = {
    top: 30,
@@ -115,7 +123,7 @@ var makeVis = function(cerealMap) {
   updateBars(newData);
 
   //update pie chart
-  var newpiedata = {Legitimate: newData[6], Fradualant: newData[7]};
+  var newpiedata = {Legitimate: piechartMap[newCereal][0], Fradualant: piechartMap[newCereal][1]};
   console.log(newpiedata);
   piechart.draw(newpiedata);
  };
@@ -142,7 +150,7 @@ var makeVis = function(cerealMap) {
 
  
  //initial pie chart
- var piedata = {Legitimate: cerealMap[cereals[0]][6], Fradualant: cerealMap[cereals[0]][7]};
+ var piedata = {Legitimate: piechartMap[cereals[0]][0], Fradualant: piechartMap[cereals[0]][1]};
  piechart = new pie_chart(d3.select('.center'), piedata);
 
 };
