@@ -11,36 +11,64 @@ from imblearn.over_sampling import SMOTE
 from collections import Counter
 from sklearn.decomposition import PCA
 
+# Functions to fetch network-based features
+def load_degree(record):
+    return records[record.split("'")[1]]['degree']
+
+def load_community(record):
+    return str(records[record.split("'")[1]]['community'])
+
+def load_pagerank(record):
+    return records[record.split("'")[1]]['pagerank']
 
 banksim_df = pd.read_csv("../data/bs140513_032310.csv")
 
 # Retrieving the class attribute from the dataframe
 labels = banksim_df['fraud']
 
-'''
-Removing unwanted columns
-Since zipcodeOri and zipMerchant have the same value for all the rows, these columns are redundant
-'''
 
-feature_df = banksim_df.drop(['step', 'customer', 'zipcodeOri', 'zipMerchant', 'fraud'], axis=1)
+# Connecting to the Neo4j database
+graph = Graph(password="root")
 
+# Query to fetch the network features from Neo4j
+query = """
+MATCH (p:Placeholder)
+RETURN p.id AS id, p.degree AS degree, p.pagerank as pagerank, p.community AS community
+"""
+
+data = graph.run(query)
+
+records = {}
+
+for record in data:
+    records[record['id']] = {'degree': record['degree'], 'pagerank': record['pagerank'], 'community': record['community']}
+
+# Merging the graph features with the banksim dataset
+banksim_df['merchant_degree'] = banksim_df['merchant'].apply(load_degree)
+banksim_df['customer_degree'] = banksim_df['customer'].apply(load_degree)
+banksim_df['merchant_pagerank'] = banksim_df['merchant'].apply(load_pagerank)
+banksim_df['customer_pagerank'] = banksim_df['customer'].apply(load_pagerank)
+banksim_df['merchant_community'] = banksim_df['merchant'].apply(load_community)
+banksim_df['customer_community'] = banksim_df['customer'].apply(load_community)
+
+labels = banksim_df['fraud']
+
+# Dropping the unnecessary columns including the age and gender attributes
+feature_df = banksim_df.drop(['step', 'age', 'gender', 'customer', 'zipcodeOri', 'zipMerchant', 'fraud'], axis=1)
 
 # One hot encoding the categorical variables
-feature_df = pd.get_dummies(feature_df, columns=['age', 'gender', 'category', 'merchant'])
+feature_df = pd.get_dummies(feature_df, columns=['category', 'merchant', 'merchant_community', 'customer_community'])
 
 # Standardizing the features
 standard_scaler = StandardScaler()
 scaled_df = pd.DataFrame(standard_scaler.fit_transform(feature_df), columns = feature_df.columns)
 
-
-# Performing dimensionality reduction using PCA
-
-# Limiting the number of components such that 95% of the variance is explained
-pca = PCA(0.95, svd_solver='full')
-scaled_df = pca.fit_transform(scaled_df)
+scaled_df = scaled_df.values
+labels = labels.values
 
 
-# Training supervised learning models using intrinsic features from the dataset
+# Training supervised learning models using intrinsic and network-based features
+
 k_fold = StratifiedKFold(n_splits=5, shuffle=False)
 
 # Initialising the three supervised learning models
@@ -65,7 +93,6 @@ for train_index, test_index in k_fold.split(scaled_df, labels):
     predictions = clf.predict(X_test)
 
     print(classification_report(y_test, predictions))
-
 
 print("\n\nBuilding Random Forest classifier with k=5 folds")
 for train_index, test_index in k_fold.split(scaled_df, labels):
