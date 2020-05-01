@@ -3,12 +3,20 @@
     <head>
         <meta charset="utf-8">
         <title>Credit Card Fraud Detection</title>
+        <h1 style="text-align:center">CUSTOMER PROFILE DASHBOARD</h1>
         <style>
         body {
             font: 10px sans-serif;
         }
         select {
-            display: block;
+            /*display: block;*/
+            margin: 30px 50px 50px 10px;
+            width: 155px;
+            padding: 5px 5px 5px 5px;
+            font-size: 16px;
+            border: 1px solid #008CBA;
+            border-radius: 4px;
+            height: 34px;
         }
         .bar {
             fill: purple;
@@ -24,8 +32,26 @@
         </style>
     </head>
     <body>
-        <div id='vis-container'></div>
-        <div class="center"></div>
+    <img src="swm.jpeg" style="float:left" width="800" height="800" ></img>
+    <div id='vis-dropdown'></div>
+    <style>
+        #vis-dropdown {
+            text-align: center;
+        }
+    </style>
+    <style>
+        #vis-container {
+            text-align: right;
+        }
+    </style>
+
+    <style>
+        .center {
+            text-align: right;
+        }
+    </style>
+    <div id='vis-container' style ="float:right" ></div>
+    <div class="center"  style ="float:right" ></div>
     </body>
         <script src="https://d3js.org/d3.v3.min.js"></script>
         <script src="index.js"></script>
