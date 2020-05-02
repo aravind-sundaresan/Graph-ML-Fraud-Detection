@@ -1,6 +1,6 @@
 # Fraud  Detection  With  Graph  Databases  and  Machine  Learning
 
-This course has been implemented as part of the CSE 573 (Semantic Web Mining) course at Arizona State University for the Spring 2020 semester. In this project, we aim to detect fraudulent behavior in bank transactions using graph databases and machine learning models.
+This project has been implemented as part of the CSE 573 (Semantic Web Mining) course at Arizona State University for the Spring 2020 semester. In this project, we aim to detect fraudulent behavior in bank transactions using graph databases and machine learning models.
 The dataset used for this project is the BankSim dataset which is a simulated dataset created using a sample of transactional data provided by a bank in Spain (https://www.kaggle.com/ntnu-testimon/banksim1).
 
 ## Folder Structure 
